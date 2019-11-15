@@ -8,19 +8,33 @@
 
 
 ```bash
-# 若服务装状态都是 RUNNING 则 
-./bkcec status cmdb 
-# 查看能否解析（非单机部署） dig 服务名 .service.consul 解析异常处理方法：
+./bkcec status cmdb
+# 若服务装状态都是 RUNNING 则查看能否解析
 dig zk.service.consul 
+; <<>> DiG 9.11.4-P2-RedHat-9.11.4-9.P2.el7 <<>> zk.service.consul
+;; global options: +cmd
+;; Got answer:
+;; ->>HEADER<<- opcode: QUERY, status: NOERROR, id: 15784
+;; flags: qr aa rd ra; QUERY: 1, ANSWER: 3, AUTHORITY: 0, ADDITIONAL: 0
+;; QUESTION SECTION:
+;zk.service.consul.  IN A
+;; ANSWER SECTION:
+zk.service.consul. 0 IN A 10.0.0.1
+zk.service.consul. 0 IN A 10.0.0.2
+zk.service.consul. 0 IN A 10.0.0.3
+;; Query time: 0 msec
+;; SERVER: 127.0.0.1#53(127.0.0.1)
+;; WHEN: Thu Nov 14 11:27:12 CST 2019
+;; MSG SIZE  rcvd: 83
 ```
 
-- 检查内部域名解析，运行 dig 域名 @127.0.0.1 看是否能解析，如果不能解析，说明 consul 有问题 
- 
-- 检查 consul 服务是否正常
- 
-- 检查三台服务器 resolv.conf  首行是否有配置 `nameserver 127.0.0.1`，如无，请添加
- 
-- 重启或重装 consul 服务
+解析异常处理方法：
+
+- 确认三台服务器 /etc/resolv.conf 配置  首行是否有配置 `nameserver 127.0.0.1`，如无，请添加
+
+- 检查consul配置中确认是否有`ls /data/bkce/etc/consul.d/zk-config.json`,如无，则重装consul服务
+
+- 重装 consul 服务
  
 ```bash
 ./bkcec stop consul  #(或在 consul 服务所在的三台主机，ps -ef |grep consul | awk '{print $2}'  |xargs kill -9)
